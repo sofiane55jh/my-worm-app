@@ -3,7 +3,7 @@ import './App.css'
 
 function App() {
   const [currentTime, setCurrentTime] = useState(new Date())
-  const [name, setName] = useState("السعد سفيان")
+  const [name, setName] = useState("سفيان")
 
   useEffect(() => {
     const timer = setInterval(() => {
