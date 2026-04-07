@@ -1,3 +1,5 @@
+
+cat > src/App.css << 'EOF'
 * {
   margin: 0;
   padding: 0;
@@ -11,20 +13,29 @@ body {
   align-items: center;
   justify-content: center;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: background 0.5s ease;
 }
 
 .container {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 30px;
-  padding: 50px;
+  padding: 40px;
   text-align: center;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  max-width: 500px;
+  max-width: 600px;
+  margin: 20px;
+  transition: all 0.3s ease;
+}
+
+.container.dark {
+  background: rgba(30, 30, 40, 0.95);
+  color: white;
 }
 
 h1 {
   color: #764ba2;
-  font-size: 32px;
+  font-size: 28px;
+  margin-bottom: 20px;
 }
 
 .name {
@@ -33,21 +44,94 @@ h1 {
   -webkit-text-fill-color: transparent;
   font-size: 36px;
   margin: 20px 0;
+  font-weight: bold;
 }
 
 .time {
   font-size: 64px;
-  font-family: monospace;
-  color: #667eea;
-  animation: glow 1s infinite alternate;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  margin: 30px 0;
+  transition: text-shadow 0.3s ease;
 }
 
-@keyframes glow {
-  from { text-shadow: 0 0 5px #667eea; }
-  to { text-shadow: 0 0 20px #764ba2; }
-}
-
-.date {
+.date, .weather {
+  font-size: 18px;
   color: #888;
-  margin-top: 20px;
+  margin: 10px 0;
 }
+
+.controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.btn {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: transform 0.2s;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+}
+
+.small-btn {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.quote-section {
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 15px;
+  padding: 15px;
+  margin: 20px 0;
+}
+
+.quote {
+  font-size: 16px;
+  font-style: italic;
+  color: #555;
+}
+
+.countdown-section {
+  margin: 20px 0;
+}
+
+.countdown {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 15px;
+  padding: 15px;
+}
+
+.countdown strong {
+  font-size: 24px;
+  color: #764ba2;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 20px;
+  }
+  .time {
+    font-size: 48px;
+  }
+  .name {
+    font-size: 28px;
+  }
+}
+EOF
