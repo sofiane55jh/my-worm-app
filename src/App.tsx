@@ -9,6 +9,12 @@ function App() {
   const [countdown, setCountdown] = useState(60)
   const [showCountdown, setShowCountdown] = useState(false)
   const [quote, setQuote] = useState("💪 لا تؤجل عمل اليوم إلى الغد")
+  const [showSidebar, setShowSidebar] = useState(false)
+  
+  // ========== إحصائيات الصلوات ==========
+  const [prayerStats, setPrayerStats] = useState({
+    الفجر: 0, الشروق: 0, الظهر: 0, العصر: 0, المغرب: 0, العشاء: 0
+  })
   
   // ========== أوقات الصلاة ==========
   const [prayerTimes, setPrayerTimes] = useState<any>(null)
@@ -27,6 +33,16 @@ function App() {
     "🌟 احلم ثم حقق أحلامك"
   ]
 
+  // تسجيل صلاة
+  const recordPrayer = (prayerName: string) => {
+    setPrayerStats({...prayerStats, [prayerName]: prayerStats[prayerName as keyof typeof prayerStats] + 1})
+    alert(`✅ تم تسجيل صلاة ${prayerName}`)
+    
+    // تأثير صوتي
+    const audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3')
+    audio.play().catch(e => console.log("صوت غير متاح"))
+  }
+
   const fetchPrayerTimes = async () => {
     setLoading(true)
     try {
@@ -41,6 +57,20 @@ function App() {
       console.error("خطأ في جلب أوقات الصلاة:", error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  // جلب المدينة تلقائياً من IP
+  const fetchCityFromIP = async () => {
+    try {
+      const response = await fetch('https://ipapi.co/json/')
+      const data = await response.json()
+      if (data.city && data.country_name) {
+        setCity(data.city)
+        setCountry(data.country_name)
+      }
+    } catch (error) {
+      console.error("خطأ في جلب المدينة:", error)
     }
   }
 
@@ -99,10 +129,16 @@ function App() {
     const seconds = Math.floor((diff % (1000 * 60)) / 1000)
     
     setTimeRemaining(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`)
+    
+    // إشعار عند قرب وقت الصلاة (قبل 5 دقائق)
+    if (hours === 0 && minutes === 5 && seconds === 0) {
+      alert(`🔔 تنبيه: سيبدأ وقت صلاة ${nextPrayer} بعد 5 دقائق`)
+    }
   }, [nextPrayerTime, currentTime])
 
   useEffect(() => {
     fetchPrayerTimes()
+    fetchCityFromIP()
   }, [city, country])
 
   const getWeather = () => {
@@ -154,6 +190,8 @@ function App() {
         setCountdown(countdown - 1)
       }, 1000)
       return () => clearTimeout(timer)
+    } else if (countdown === 0) {
+      alert("⏰ انتهى الوقت! 🎉")
     }
   }, [showCountdown, countdown])
 
@@ -166,94 +204,134 @@ function App() {
   const weekDays = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت']
   const dayName = weekDays[currentTime.getDay()]
 
+  // حساب نسبة إنجاز الصلوات
+  const totalPrayers = Object.values(prayerStats).reduce((a, b) => a + b, 0)
+  const completionRate = Math.min(100, (totalPrayers / 6) * 100)
+
   return (
-    <div className={`container ${darkMode ? 'dark' : ''}`}>
-      <h1>✨ {getGreeting()} ✨</h1>
-      <h2 className="name">{name}</h2>
-      
-      <div className="controls">
-        <button onClick={() => setDarkMode(!darkMode)} className="btn">
-          {darkMode ? '☀️ وضع نهاري' : '🌙 وضع ليلي'}
-        </button>
-        <button onClick={changeGlowColor} className="btn">
-          🎨 تغيير لون التوهج
-        </button>
-        <button onClick={changeBackground} className="btn">
-          🖼️ تغيير الخلفية
-        </button>
+    <>
+      {/* زر القائمة الجانبية */}
+      <button className="sidebar-toggle" onClick={() => setShowSidebar(!showSidebar)}>
+        ☰
+      </button>
+
+      {/* القائمة الجانبية */}
+      <div className={`sidebar ${showSidebar ? 'open' : ''}`}>
+        <h3>📋 القائمة</h3>
+        <ul>
+          <li onClick={() => window.open('https://quran.com/', '_blank')}>📖 المصحف</li>
+          <li onClick={() => window.open('https://www.islamweb.net/', '_blank')}>📚 مكتبة إسلامية</li>
+          <li onClick={() => window.open('https://www.youtube.com/results?search_query=قرآن+كريم', '_blank')}>🎬 فيديوهات قرآنية</li>
+          <li onClick={() => setShowSidebar(false)}>❌ إغلاق</li>
+        </ul>
       </div>
 
-      {/* ========== قسم أوقات الصلاة ========== */}
-      <div className="prayer-section">
-        <div className="prayer-header">
-          <h3>🕌 أوقات الصلاة في {city}</h3>
-          <div className="city-controls">
-            <input
-              type="text"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              placeholder="المدينة"
-              className="city-input"
-            />
-            <input
-              type="text"
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-              placeholder="الدولة"
-              className="city-input"
-            />
-            <button onClick={fetchPrayerTimes} className="small-btn">🔍 بحث</button>
+      <div className={`container ${darkMode ? 'dark' : ''}`}>
+        <h1>✨ {getGreeting()} ✨</h1>
+        <h2 className="name">{name}</h2>
+        
+        <div className="controls">
+          <button onClick={() => setDarkMode(!darkMode)} className="btn">
+            {darkMode ? '☀️ وضع نهاري' : '🌙 وضع ليلي'}
+          </button>
+          <button onClick={changeGlowColor} className="btn">
+            🎨 تغيير لون التوهج
+          </button>
+          <button onClick={changeBackground} className="btn">
+            🖼️ تغيير الخلفية
+          </button>
+        </div>
+
+        {/* قسم إحصائيات الصلوات */}
+        <div className="stats-chart">
+          <h3>📊 إحصائيات الصلوات اليومية</h3>
+          <div className="progress-bar">
+            <div className="progress-fill" style={{ width: `${completionRate}%` }}></div>
+          </div>
+          <p className="stats-text">نسبة الإنجاز: {Math.round(completionRate)}%</p>
+          <div className="prayer-stats-grid">
+            {Object.entries(prayerStats).map(([prayer, count]) => (
+              <div key={prayer} className="prayer-stat">
+                <span>🕌 {prayer}</span>
+                <strong>{count}</strong>
+                <button onClick={() => recordPrayer(prayer)} className="small-btn">➕</button>
+              </div>
+            ))}
           </div>
         </div>
 
-        {loading ? (
-          <p className="loading-text">جاري تحميل أوقات الصلاة...</p>
-        ) : prayerTimes ? (
-          <div className="prayer-times-grid">
-            <div className="prayer-card"><span>🇫🇯 الفجر</span><strong>{prayerTimes.Fajr?.substring(0, 5)}</strong></div>
-            <div className="prayer-card"><span>☀️ الشروق</span><strong>{prayerTimes.Sunrise?.substring(0, 5)}</strong></div>
-            <div className="prayer-card"><span>🌙 الظهر</span><strong>{prayerTimes.Dhuhr?.substring(0, 5)}</strong></div>
-            <div className="prayer-card"><span>📖 العصر</span><strong>{prayerTimes.Asr?.substring(0, 5)}</strong></div>
-            <div className="prayer-card"><span>🌅 المغرب</span><strong>{prayerTimes.Maghrib?.substring(0, 5)}</strong></div>
-            <div className="prayer-card"><span>⭐ العشاء</span><strong>{prayerTimes.Isha?.substring(0, 5)}</strong></div>
+        {/* قسم أوقات الصلاة */}
+        <div className="prayer-section">
+          <div className="prayer-header">
+            <h3>🕌 أوقات الصلاة في {city}</h3>
+            <div className="city-controls">
+              <input
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder="المدينة"
+                className="city-input"
+              />
+              <input
+                type="text"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                placeholder="الدولة"
+                className="city-input"
+              />
+              <button onClick={fetchPrayerTimes} className="small-btn">🔍 بحث</button>
+            </div>
           </div>
-        ) : null}
 
-        {nextPrayer && nextPrayerTime && (
-          <div className="next-prayer">
-            <p>🕋 الصلاة القادمة: <strong>{nextPrayer}</strong> الساعة <strong>{nextPrayerTime}</strong></p>
-            {timeRemaining && <p>⏳ الوقت المتبقي: <strong>{timeRemaining}</strong></p>}
-          </div>
-        )}
-      </div>
+          {loading ? (
+            <p className="loading-text">جاري تحميل أوقات الصلاة...</p>
+          ) : prayerTimes ? (
+            <div className="prayer-times-grid">
+              <div className="prayer-card"><span>🇫🇯 الفجر</span><strong>{prayerTimes.Fajr?.substring(0, 5)}</strong></div>
+              <div className="prayer-card"><span>☀️ الشروق</span><strong>{prayerTimes.Sunrise?.substring(0, 5)}</strong></div>
+              <div className="prayer-card"><span>🌙 الظهر</span><strong>{prayerTimes.Dhuhr?.substring(0, 5)}</strong></div>
+              <div className="prayer-card"><span>📖 العصر</span><strong>{prayerTimes.Asr?.substring(0, 5)}</strong></div>
+              <div className="prayer-card"><span>🌅 المغرب</span><strong>{prayerTimes.Maghrib?.substring(0, 5)}</strong></div>
+              <div className="prayer-card"><span>⭐ العشاء</span><strong>{prayerTimes.Isha?.substring(0, 5)}</strong></div>
+            </div>
+          ) : null}
 
-      <div className="time" style={{ textShadow: `0 0 20px ${glowColor}, 0 0 30px ${glowColor}` }}>
-        {hours.toString().padStart(2, '0')}:{minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
-      </div>
-      
-      <p className="date">📅 {dayName} - {day}/{month}/{year}</p>
-      <p className="weather">🌡️ {getWeather()}</p>
-      
-      <div className="quote-section">
-        <p className="quote">📖 {quote}</p>
-        <button onClick={changeQuote} className="small-btn">
-          🔄 تغيير الاقتباس
-        </button>
-      </div>
+          {nextPrayer && nextPrayerTime && (
+            <div className="next-prayer">
+              <p>🕋 الصلاة القادمة: <strong>{nextPrayer}</strong> الساعة <strong>{nextPrayerTime}</strong></p>
+              {timeRemaining && <p>⏳ الوقت المتبقي: <strong>{timeRemaining}</strong></p>}
+            </div>
+          )}
+        </div>
 
-      <div className="countdown-section">
-        {!showCountdown ? (
-          <button onClick={startCountdown} className="btn">
-            ⏱️ بدء عداد تنازلي (60 ثانية)
+        <div className="time" style={{ textShadow: `0 0 20px ${glowColor}, 0 0 30px ${glowColor}` }}>
+          {hours.toString().padStart(2, '0')}:{minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
+        </div>
+        
+        <p className="date">📅 {dayName} - {day}/{month}/{year}</p>
+        <p className="weather">🌡️ {getWeather()}</p>
+        
+        <div className="quote-section">
+          <p className="quote">📖 {quote}</p>
+          <button onClick={changeQuote} className="small-btn">
+            🔄 تغيير الاقتباس
           </button>
-        ) : (
-          <div className="countdown">
-            <p>⏰ الوقت المتبقي: <strong>{countdown}</strong> ثانية</p>
-            {countdown === 0 && <p>🎉 انتهى الوقت! 🎉</p>}
-          </div>
-        )}
+        </div>
+
+        <div className="countdown-section">
+          {!showCountdown ? (
+            <button onClick={startCountdown} className="btn">
+              ⏱️ بدء عداد تنازلي (60 ثانية)
+            </button>
+          ) : (
+            <div className="countdown">
+              <p>⏰ الوقت المتبقي: <strong>{countdown}</strong> ثانية</p>
+              {countdown === 0 && <p>🎉 انتهى الوقت! 🎉</p>}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 
