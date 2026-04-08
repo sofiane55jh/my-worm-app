@@ -3,7 +3,7 @@ import './App.css'
 
 function App() {
   const [currentTime, setCurrentTime] = useState(new Date())
-  const [name, setName] = useState("سفيان")
+  const [name, setName] = useState("السعد سفيان")
   const [glowColor, setGlowColor] = useState("#667eea")
   const [darkMode, setDarkMode] = useState(false)
   const [countdown, setCountdown] = useState(60)
@@ -12,11 +12,12 @@ function App() {
   
   // ========== أوقات الصلاة ==========
   const [prayerTimes, setPrayerTimes] = useState<any>(null)
-  const [city, setCity] = useState("الدار البيضاء")
-  const [country, setCountry] = useState("المغرب")
+  const [city, setCity] = useState("الجزائر")
+  const [country, setCountry] = useState("الجزائر")
   const [loading, setLoading] = useState(true)
   const [nextPrayer, setNextPrayer] = useState("")
   const [nextPrayerTime, setNextPrayerTime] = useState("")
+  const [timeRemaining, setTimeRemaining] = useState("")
 
   const quotes = [
     "💪 لا تؤجل عمل اليوم إلى الغد",
@@ -26,7 +27,6 @@ function App() {
     "🌟 احلم ثم حقق أحلامك"
   ]
 
-  // جلب أوقات الصلاة من API
   const fetchPrayerTimes = async () => {
     setLoading(true)
     try {
@@ -44,7 +44,6 @@ function App() {
     }
   }
 
-  // تحديث الوقت الحالي والصلاة القادمة كل ثانية
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date())
@@ -52,7 +51,6 @@ function App() {
     return () => clearInterval(timer)
   }, [])
 
-  // حساب الصلاة القادمة
   useEffect(() => {
     if (!prayerTimes) return
 
@@ -83,7 +81,26 @@ function App() {
     setNextPrayerTime(next.time)
   }, [currentTime, prayerTimes])
 
-  // جلب الصلاة عند تغيير المدينة
+  useEffect(() => {
+    if (!nextPrayerTime) return
+    
+    const now = new Date()
+    const [prayerHour, prayerMinute] = nextPrayerTime.split(':').map(Number)
+    const prayerDate = new Date(now)
+    prayerDate.setHours(prayerHour, prayerMinute, 0)
+    
+    if (prayerDate < now) {
+      prayerDate.setDate(prayerDate.getDate() + 1)
+    }
+    
+    const diff = prayerDate.getTime() - now.getTime()
+    const hours = Math.floor(diff / (1000 * 60 * 60))
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000)
+    
+    setTimeRemaining(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`)
+  }, [nextPrayerTime, currentTime])
+
   useEffect(() => {
     fetchPrayerTimes()
   }, [city, country])
@@ -205,6 +222,7 @@ function App() {
         {nextPrayer && nextPrayerTime && (
           <div className="next-prayer">
             <p>🕋 الصلاة القادمة: <strong>{nextPrayer}</strong> الساعة <strong>{nextPrayerTime}</strong></p>
+            {timeRemaining && <p>⏳ الوقت المتبقي: <strong>{timeRemaining}</strong></p>}
           </div>
         )}
       </div>
