@@ -7,9 +7,6 @@
 body {
   background: linear-gradient(135deg, #667eea, #764ba2);
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   transition: background 0.5s ease;
 }
@@ -17,11 +14,11 @@ body {
 .container {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 30px;
-  padding: 40px;
+  padding: 20px;
   text-align: center;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  max-width: 600px;
-  margin: 20px;
+  max-width: 500px;
+  margin: 20px auto;
   transition: all 0.3s ease;
 }
 
@@ -32,49 +29,35 @@ body {
 
 h1 {
   color: #764ba2;
-  font-size: 28px;
-  margin-bottom: 20px;
+  font-size: 24px;
+  margin-bottom: 10px;
 }
 
 .name {
   background: linear-gradient(135deg, #667eea, #764ba2);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  font-size: 36px;
-  margin: 20px 0;
-  font-weight: bold;
-}
-
-.time {
-  font-size: 64px;
-  font-family: 'Courier New', monospace;
-  font-weight: bold;
-  margin: 30px 0;
-  transition: text-shadow 0.3s ease;
-}
-
-.date, .weather {
-  font-size: 18px;
-  color: #888;
+  font-size: 28px;
   margin: 10px 0;
+  font-weight: bold;
 }
 
 .controls {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   justify-content: center;
   flex-wrap: wrap;
-  margin: 20px 0;
+  margin: 15px 0;
 }
 
 .btn {
   background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 8px 12px;
   border-radius: 25px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 12px;
   transition: transform 0.2s;
 }
 
@@ -86,116 +69,81 @@ h1 {
   background: #667eea;
   color: white;
   border: none;
-  padding: 8px 16px;
-  border-radius: 20px;
+  padding: 5px 10px;
+  border-radius: 15px;
   cursor: pointer;
-  margin-top: 10px;
-  font-size: 12px;
+  font-size: 11px;
+  margin-top: 5px;
 }
 
-.quote-section {
-  background: rgba(102, 126, 234, 0.1);
-  border-radius: 15px;
-  padding: 15px;
+.time {
+  font-size: 48px;
+  font-family: monospace;
+  font-weight: bold;
   margin: 20px 0;
+  transition: text-shadow 0.3s ease;
 }
 
-.quote {
-  font-size: 16px;
-  font-style: italic;
-  color: #555;
+.date, .weather {
+  font-size: 14px;
+  color: #888;
+  margin: 5px 0;
 }
 
-.countdown-section {
-  margin: 20px 0;
-}
-
-.countdown {
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 15px;
-  padding: 15px;
-}
-
-.countdown strong {
-  font-size: 24px;
-  color: #764ba2;
-}
-
-@media (max-width: 600px) {
-  .container {
-    padding: 20px;
-  }
-  .time {
-    font-size: 48px;
-  }
-  .name {
-    font-size: 28px;
-  }
-}
-
-/* ========== قسم أوقات الصلاة ========== */
 .prayer-section {
   background: rgba(102, 126, 234, 0.15);
   border-radius: 20px;
   padding: 15px;
-  margin: 20px 0;
+  margin: 15px 0;
 }
 
 .prayer-header h3 {
   color: #764ba2;
   margin-bottom: 10px;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .city-controls {
   display: flex;
-  gap: 8px;
+  gap: 5px;
   justify-content: center;
   flex-wrap: wrap;
   margin: 10px 0;
 }
 
 .city-input {
-  padding: 8px 12px;
+  padding: 5px 8px;
   border: 2px solid #667eea;
   border-radius: 20px;
-  font-size: 14px;
-  width: 120px;
+  font-size: 12px;
+  width: 100px;
   text-align: center;
-  background: rgba(255, 255, 255, 0.9);
 }
 
 .prayer-times-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin: 15px 0;
+  gap: 8px;
+  margin: 10px 0;
 }
 
 .prayer-card {
   background: rgba(255, 255, 255, 0.9);
   border-radius: 15px;
-  padding: 10px;
+  padding: 8px;
   text-align: center;
-  transition: transform 0.2s;
-}
-
-.prayer-card:hover {
-  transform: scale(1.05);
 }
 
 .prayer-card span {
   display: block;
-  font-size: 14px;
+  font-size: 11px;
   color: #666;
-  margin-bottom: 5px;
 }
 
 .prayer-card strong {
   display: block;
-  font-size: 18px;
+  font-size: 14px;
   color: #667eea;
-  font-family: monospace;
 }
 
 .next-prayer {
@@ -207,730 +155,47 @@ h1 {
   color: white;
 }
 
-.next-prayer strong {
-  font-weight: bold;
-  font-size: 18px;
+.quote-section {
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 15px;
+  padding: 10px;
+  margin: 15px 0;
 }
 
-.loading-text {
-  text-align: center;
-  color: #888;
-  padding: 20px;
-}
-
-@media (max-width: 600px) {
-  .prayer-times-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .city-input {
-    width: 100px;
-    font-size: 12px;
-  }
-}
-
-/* ========== مؤثرات متحركة إضافية ========== */
-
-/* خلفية متحركة متدرجة */
-body {
-  background-size: 200% 200%;
-  animation: gradientMove 8s ease infinite;
-}
-
-@keyframes gradientMove {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* بطاقات أوقات الصلاة تتألق */
-.prayer-card {
-  transition: all 0.3s ease;
-  animation: cardGlow 2s ease-in-out infinite alternate;
-}
-
-@keyframes cardGlow {
-  0% { box-shadow: 0 0 5px rgba(102, 126, 234, 0.3); transform: scale(1); }
-  100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.6); transform: scale(1.02); }
-}
-
-/* الوقت يتنفس */
-.time {
-  animation: breathe 2s ease-in-out infinite;
-}
-
-@keyframes breathe {
-  0% { opacity: 0.9; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.02); }
-  100% { opacity: 0.9; transform: scale(1); }
-}
-
-/* الأزرار تهتز عند المرور */
-.btn {
-  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-.btn:hover {
-  animation: shake 0.5s ease;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-3px); }
-  75% { transform: translateX(3px); }
-}
-
-/* ظهور تدريجي للبطاقات */
-.prayer-card {
-  animation: fadeInScale 0.5s ease-out;
-}
-
-@keyframes fadeInScale {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* نبض للصلاة القادمة */
-.next-prayer {
-  animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.02); opacity: 0.95; }
-}
-
-/* دوران خفيف للشعارات */
-.logo {
-  animation: spin 20s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* تأثير كتابة للاقتباسات */
 .quote {
-  overflow: hidden;
-  border-right: 2px solid #667eea;
-  white-space: nowrap;
-  animation: typing 3s steps(40, end), blink-caret 0.75s step-end infinite;
+  font-size: 14px;
+  font-style: italic;
+  color: #555;
 }
 
-@keyframes typing {
-  from { width: 0; }
-  to { width: 100%; }
+.countdown-section {
+  margin: 15px 0;
 }
 
-@keyframes blink-caret {
-  from, to { border-color: transparent; }
-  50% { border-color: #667eea; }
-}
-
-/* عند الشاشات الصغيرة، إلغاء تأثير الكتابة */
-@media (max-width: 600px) {
-  .quote {
-    white-space: normal;
-    animation: none;
-    border-right: none;
-  }
-}
-
-/* ========== مؤثرات دخول الصفحة ========== */
-
-/* ظهور الصفحة بحركة */
-.container {
-  animation: slideIn 0.6s ease-out;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* جسيمات متطايرة في الخلفية */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%);
-  animation: particleFloat 15s infinite;
-}
-
-@keyframes particleFloat {
-  0% { transform: translateX(-10%) translateY(-10%); }
-  100% { transform: translateX(10%) translateY(10%); }
-}
-
-/* تأثير زجاجي (Glassmorphism) للبطاقات */
-.prayer-section {
-  backdrop-filter: blur(10px);
-  background: rgba(102, 126, 234, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-/* توهج للعنوان */
-h1 {
-  animation: titleGlow 3s ease-in-out infinite;
-}
-
-@keyframes titleGlow {
-  0%, 100% { text-shadow: 0 0 5px #764ba2; }
-  50% { text-shadow: 0 0 20px #764ba2, 0 0 30px #667eea; }
-}
-
-/* ========== قسم الفيديو ========== */
-.video-section {
-  margin: 20px 0;
-  animation: fadeInUp 0.5s ease-out;
-}
-
-.video-container {
-  background: rgba(0, 0, 0, 0.8);
-  border-radius: 20px;
+.countdown {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 15px;
   padding: 10px;
-  overflow: hidden;
 }
 
-iframe {
-  border-radius: 15px;
-  min-height: 200px;
-  width: 100%;
-}
-
-.video-controls {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.video-input {
-  padding: 8px 12px;
-  border: 2px solid #667eea;
-  border-radius: 20px;
-  font-size: 12px;
-  width: 200px;
-  background: white;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ========== إحصائيات العبادات ========== */
-.stats-section {
-  margin: 20px 0;
-  background: rgba(102, 126, 234, 0.15);
-  border-radius: 20px;
-  padding: 15px;
-}
-
-.stats-section h3 {
-  text-align: center;
-  color: #764ba2;
-  margin-bottom: 15px;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.stat-card {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 15px;
-  padding: 15px;
-  text-align: center;
-}
-
-.stat-card span {
-  display: block;
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 5px;
-}
-
-.stat-card strong {
-  display: block;
-  font-size: 28px;
-  color: #667eea;
-  margin-bottom: 10px;
-}
-
-/* ========== قسم القرآن الكريم ========== */
-.quran-section {
-  margin: 20px 0;
-  background: rgba(102, 126, 234, 0.15);
-  border-radius: 20px;
-  padding: 15px;
-  animation: fadeInUp 0.5s ease-out;
-}
-
-.surah-list h3 {
-  color: #764ba2;
-  margin-bottom: 10px;
-  font-size: 18px;
-  text-align: center;
-}
-
-.surah-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  margin-bottom: 15px;
-}
-
-.surah-btn {
-  background: rgba(255, 255, 255, 0.9);
-  color: #667eea;
-  border: 2px solid #667eea;
-  padding: 8px 16px;
-  border-radius: 25px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-.surah-btn:hover {
-  background: #667eea;
-  color: white;
-  transform: scale(1.05);
-}
-
-.surah-btn.active {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  border-color: transparent;
-}
-
-/* ========== قسم الفيديو ========== */
-.video-section {
-  margin: 20px 0;
-  animation: fadeInUp 0.5s ease-out;
-}
-
-.video-container {
-  background: rgba(0, 0, 0, 0.8);
-  border-radius: 20px;
-  padding: 10px;
-  overflow: hidden;
-}
-
-iframe {
-  border-radius: 15px;
-  min-height: 200px;
-  width: 100%;
-}
-
-.video-controls {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.video-input {
-  padding: 8px 12px;
-  border: 2px solid #667eea;
-  border-radius: 20px;
-  font-size: 12px;
-  width: 200px;
-  background: white;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@media (max-width: 600px) {
-  .surah-btn {
-    padding: 6px 12px;
-    font-size: 12px;
-  }
-  .stats-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 5px;
-  }
-  .stat-card {
-    padding: 10px;
-  }
-  .stat-card strong {
-    font-size: 20px;
-  }
-}
-
-/* ========== إحصائيات العبادات ========== */
-.stats-section {
-  margin: 20px 0;
-  background: rgba(102, 126, 234, 0.15);
-  border-radius: 20px;
-  padding: 15px;
-}
-
-.stats-section h3 {
-  text-align: center;
-  color: #764ba2;
-  margin-bottom: 15px;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.stat-card {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 15px;
-  padding: 15px;
-  text-align: center;
-}
-
-.stat-card span {
-  display: block;
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 5px;
-}
-
-.stat-card strong {
-  display: block;
-  font-size: 28px;
-  color: #667eea;
-  margin-bottom: 10px;
-}
-
-.stat-card button {
-  margin-top: 5px;
-}
-
-/* ========== قسم الفيديو والقرآن ========== */
-.video-section {
-  margin: 20px 0;
-  animation: fadeInUp 0.5s ease-out;
-}
-
-.video-container {
-  background: rgba(0, 0, 0, 0.8);
-  border-radius: 20px;
-  padding: 10px;
-  overflow: hidden;
-}
-
-iframe {
-  border-radius: 15px;
-  min-height: 200px;
-  width: 100%;
-}
-
-.video-controls {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.video-input {
-  padding: 8px 12px;
-  border: 2px solid #667eea;
-  border-radius: 20px;
-  font-size: 12px;
-  width: 200px;
-  background: white;
-}
-
-.quran-section {
-  margin: 20px 0;
-  background: rgba(102, 126, 234, 0.15);
-  border-radius: 20px;
-  padding: 15px;
-}
-
-.quran-section h3 {
-  text-align: center;
-  color: #764ba2;
-  margin-bottom: 15px;
-}
-
-.surah-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  margin-bottom: 15px;
-}
-
-.surah-btn {
-  background: rgba(255, 255, 255, 0.9);
-  color: #667eea;
-  border: 2px solid #667eea;
-  padding: 8px 16px;
-  border-radius: 25px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-.surah-btn:hover {
-  background: #667eea;
-  color: white;
-  transform: scale(1.05);
-}
-
-.surah-btn.active {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  border-color: transparent;
-}
-
-/* ========== إحصائيات العبادات ========== */
-.stats-section {
-  margin: 20px 0;
-  background: rgba(102, 126, 234, 0.15);
-  border-radius: 20px;
-  padding: 15px;
-}
-
-.stats-section h3 {
-  text-align: center;
-  color: #764ba2;
-  margin-bottom: 15px;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.stat-card {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 15px;
-  padding: 15px;
-  text-align: center;
-}
-
-.stat-card span {
-  display: block;
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 5px;
-}
-
-.stat-card strong {
-  display: block;
-  font-size: 28px;
-  color: #667eea;
-  margin-bottom: 10px;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ========== مشغل الصوت ========== */
-.audio-player {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 15px;
-  padding: 15px;
-  text-align: center;
-  margin-top: 10px;
-}
-
-.audio-player p {
-  margin-bottom: 10px;
-  color: #667eea;
-  font-weight: bold;
-}
-
-.audio-note {
-  font-size: 12px;
-  color: #888;
-  margin-top: 8px;
-}
-
-audio {
-  width: 100%;
-  border-radius: 10px;
-  outline: none;
-}
-
-/* ========== قسم القرآن ========== */
-.quran-section {
-  margin: 20px 0;
-  background: rgba(102, 126, 234, 0.15);
-  border-radius: 20px;
-  padding: 15px;
-}
-
-.quran-section h3 {
-  text-align: center;
-  color: #764ba2;
-  margin-bottom: 15px;
-}
-
-.surah-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  margin-bottom: 15px;
-}
-
-.surah-btn {
-  background: rgba(255, 255, 255, 0.9);
-  color: #667eea;
-  border: 2px solid #667eea;
-  padding: 8px 16px;
-  border-radius: 25px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-.surah-btn:hover {
-  background: #667eea;
-  color: white;
-  transform: scale(1.05);
-}
-
-.surah-btn.active {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  border-color: transparent;
-}
-
-/* ========== القائمة الجانبية ========== */
-.sidebar-toggle {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  border: none;
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  font-size: 24px;
-  cursor: pointer;
-  z-index: 1000;
-  transition: all 0.3s ease;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-.sidebar-toggle:hover {
-  transform: scale(1.1);
-}
-
-.sidebar {
-  position: fixed;
-  top: 0;
-  left: -280px;
-  width: 260px;
-  height: 100%;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  padding: 20px;
-  transition: left 0.3s ease;
-  z-index: 1001;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.3);
-}
-
-.sidebar.open {
-  left: 0;
-}
-
-.sidebar h3 {
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.sidebar ul {
-  list-style: none;
-  padding: 0;
-}
-
-.sidebar li {
-  padding: 15px;
-  margin: 5px 0;
-  background: rgba(255,255,255,0.2);
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: center;
-}
-
-.sidebar li:hover {
-  background: rgba(255,255,255,0.4);
-  transform: translateX(5px);
-}
-
-/* ========== إحصائيات الصلوات ========== */
 .stats-chart {
-  margin: 20px 0;
   background: rgba(102, 126, 234, 0.15);
   border-radius: 20px;
   padding: 15px;
+  margin: 15px 0;
 }
 
 .stats-chart h3 {
-  text-align: center;
-  color: #764ba2;
-  margin-bottom: 15px;
+  font-size: 16px;
+  margin-bottom: 10px;
 }
 
 .progress-bar {
-  background: rgba(255,255,255,0.3);
+  background: rgba(255, 255, 255, 0.3);
   border-radius: 10px;
-  height: 20px;
+  height: 15px;
   overflow: hidden;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .progress-fill {
@@ -941,34 +206,228 @@ audio {
 }
 
 .stats-text {
-  text-align: center;
-  font-size: 14px;
-  color: #888;
-  margin-bottom: 15px;
+  font-size: 12px;
+  margin-bottom: 10px;
 }
 
 .prayer-stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 8px;
 }
 
 .prayer-stat {
-  background: rgba(255,255,255,0.9);
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 15px;
-  padding: 10px;
+  padding: 8px;
   text-align: center;
 }
 
 .prayer-stat span {
   display: block;
-  font-size: 12px;
+  font-size: 10px;
   color: #666;
 }
 
 .prayer-stat strong {
   display: block;
-  font-size: 24px;
+  font-size: 18px;
   color: #667eea;
+}
+
+.sidebar-toggle {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -260px;
+  width: 240px;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 20px;
+  transition: left 0.3s ease;
+  z-index: 1001;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar h3 {
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  padding: 12px;
   margin: 5px 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.notif-status {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 5px;
+  border-radius: 10px;
+}
+
+.ai-assistant {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  width: 280px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  overflow: hidden;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ai-header {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ai-header h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.close-ai {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.ai-body {
+  padding: 12px;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.ai-welcome {
+  background: #f0f0f0;
+  padding: 10px;
+  border-radius: 15px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: #666;
+}
+
+.ai-answer {
+  background: #e8f4f8;
+  padding: 10px;
+  border-radius: 15px;
+  margin-bottom: 12px;
+  border-right: 3px solid #667eea;
+}
+
+.ai-answer strong {
+  display: block;
+  color: #667eea;
+  margin-bottom: 5px;
+  font-size: 12px;
+}
+
+.ai-answer p {
+  margin: 0;
+  color: #333;
+  font-size: 13px;
+}
+
+.ai-loading {
+  text-align: center;
+  color: #667eea;
+  margin: 10px 0;
+  font-size: 12px;
+}
+
+.ai-input-area {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.ai-input {
+  flex: 1;
+  padding: 8px;
+  border: 2px solid #667eea;
+  border-radius: 20px;
+  font-size: 12px;
+  outline: none;
+}
+
+.ai-send-btn {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 0 12px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 15px;
+    margin: 10px;
+  }
+  .time {
+    font-size: 36px;
+  }
+  .name {
+    font-size: 22px;
+  }
+  .ai-assistant {
+    width: 260px;
+    bottom: 10px;
+    right: 10px;
+  }
+  .prayer-times-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .prayer-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }

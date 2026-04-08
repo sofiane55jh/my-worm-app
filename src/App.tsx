@@ -10,6 +10,14 @@ function App() {
   const [showCountdown, setShowCountdown] = useState(false)
   const [quote, setQuote] = useState("💪 لا تؤجل عمل اليوم إلى الغد")
   const [showSidebar, setShowSidebar] = useState(false)
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false)
+  const [lastNotified, setLastNotified] = useState("")
+  
+  // ========== الذكاء الاصطناعي ==========
+  const [showAI, setShowAI] = useState(false)
+  const [aiQuestion, setAiQuestion] = useState("")
+  const [aiAnswer, setAiAnswer] = useState("")
+  const [aiLoading, setAiLoading] = useState(false)
   
   // ========== إحصائيات الصلوات ==========
   const [prayerStats, setPrayerStats] = useState({
@@ -33,12 +41,58 @@ function App() {
     "🌟 احلم ثم حقق أحلامك"
   ]
 
+  // طلب إذن الإشعارات
+  const requestNotificationPermission = async () => {
+    if ('Notification' in window) {
+      const permission = await Notification.requestPermission()
+      if (permission === 'granted') {
+        setNotificationsEnabled(true)
+        alert("✅ تم تفعيل الإشعارات! سيتم تنبيهك عند وقت الصلاة")
+      } else {
+        alert("⚠️ لم يتم تفعيل الإشعارات")
+      }
+    } else {
+      alert("⚠️ المتصفح لا يدعم الإشعارات")
+    }
+  }
+
+  // إرسال إشعار
+  const sendNotification = (title: string, body: string) => {
+    if (notificationsEnabled && 'Notification' in window && Notification.permission === 'granted') {
+      new Notification(title, { body, icon: 'https://cdn-icons-png.flaticon.com/512/2858/2858518.png' })
+    }
+  }
+
+  // المساعد الذكي
+  const askAI = async () => {
+    if (!aiQuestion.trim()) return
+    
+    setAiLoading(true)
+    setAiAnswer("")
+    
+    const answers = [
+      "🌙 بناءً على سؤالك، أنصحك بالصبر والدعاء. قال تعالى: 'إن الله مع الصابرين'",
+      "📖 هذا سؤال مهم. تذكر أن ذكر الله يطمئن القلوب.",
+      "🕌 الوقت المناسب لفعل ذلك هو بعد صلاة الفجر، فهي ساعة استجابة.",
+      "💚 أنصحك بقراءة سورة الكهف يوم الجمعة، فيها نور بين الجمعتين.",
+      "🤲 تذكر قول النبي ﷺ: 'لا ضرر ولا ضرار' في جميع أمورك.",
+      "✨ الدعاء هو مفتاح كل خير، قال تعالى: 'ادعوني أستجب لكم'.",
+      "💝 الصدقة تطفيء الخطيئة كما يطفيء الماء النار، فأكثر منها.",
+      "🌟 الاستغفار يجلب الرزق والبركة، قال تعالى: 'استغفروا ربكم إنه كان غفاراً'."
+    ]
+    
+    setTimeout(() => {
+      const randomAnswer = answers[Math.floor(Math.random() * answers.length)]
+      setAiAnswer(randomAnswer)
+      setAiLoading(false)
+    }, 1000)
+  }
+
   // تسجيل صلاة
   const recordPrayer = (prayerName: string) => {
     setPrayerStats({...prayerStats, [prayerName]: prayerStats[prayerName as keyof typeof prayerStats] + 1})
     alert(`✅ تم تسجيل صلاة ${prayerName}`)
     
-    // تأثير صوتي
     const audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3')
     audio.play().catch(e => console.log("صوت غير متاح"))
   }
@@ -60,7 +114,6 @@ function App() {
     }
   }
 
-  // جلب المدينة تلقائياً من IP
   const fetchCityFromIP = async () => {
     try {
       const response = await fetch('https://ipapi.co/json/')
@@ -130,11 +183,19 @@ function App() {
     
     setTimeRemaining(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`)
     
-    // إشعار عند قرب وقت الصلاة (قبل 5 دقائق)
-    if (hours === 0 && minutes === 5 && seconds === 0) {
-      alert(`🔔 تنبيه: سيبدأ وقت صلاة ${nextPrayer} بعد 5 دقائق`)
+    if (hours === 0 && minutes === 5 && seconds === 0 && lastNotified !== nextPrayer) {
+      sendNotification(`🕌 موعد صلاة ${nextPrayer}`, `سيبدأ وقت صلاة ${nextPrayer} بعد 5 دقائق`)
+      setLastNotified(nextPrayer)
+      
+      const audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3')
+      audio.play().catch(e => console.log("صوت غير متاح"))
     }
-  }, [nextPrayerTime, currentTime])
+    
+    if (hours === 0 && minutes === 0 && seconds === 0 && lastNotified !== `now-${nextPrayer}`) {
+      sendNotification(`🕌 حان وقت صلاة ${nextPrayer}`, `أقم الصلاة يرحمك الله`)
+      setLastNotified(`now-${nextPrayer}`)
+    }
+  }, [nextPrayerTime, currentTime, lastNotified, nextPrayer])
 
   useEffect(() => {
     fetchPrayerTimes()
@@ -191,6 +252,7 @@ function App() {
       }, 1000)
       return () => clearTimeout(timer)
     } else if (countdown === 0) {
+      sendNotification("⏰ انتهى الوقت!", "العداد التنازلي قد انتهى")
       alert("⏰ انتهى الوقت! 🎉")
     }
   }, [showCountdown, countdown])
@@ -204,26 +266,24 @@ function App() {
   const weekDays = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت']
   const dayName = weekDays[currentTime.getDay()]
 
-  // حساب نسبة إنجاز الصلوات
   const totalPrayers = Object.values(prayerStats).reduce((a, b) => a + b, 0)
   const completionRate = Math.min(100, (totalPrayers / 6) * 100)
 
   return (
     <>
-      {/* زر القائمة الجانبية */}
       <button className="sidebar-toggle" onClick={() => setShowSidebar(!showSidebar)}>
         ☰
       </button>
 
-      {/* القائمة الجانبية */}
       <div className={`sidebar ${showSidebar ? 'open' : ''}`}>
         <h3>📋 القائمة</h3>
         <ul>
           <li onClick={() => window.open('https://quran.com/', '_blank')}>📖 المصحف</li>
           <li onClick={() => window.open('https://www.islamweb.net/', '_blank')}>📚 مكتبة إسلامية</li>
-          <li onClick={() => window.open('https://www.youtube.com/results?search_query=قرآن+كريم', '_blank')}>🎬 فيديوهات قرآنية</li>
+          <li onClick={requestNotificationPermission}>🔔 تفعيل الإشعارات</li>
           <li onClick={() => setShowSidebar(false)}>❌ إغلاق</li>
         </ul>
+        {notificationsEnabled && <p className="notif-status">✅ الإشعارات مفعلة</p>}
       </div>
 
       <div className={`container ${darkMode ? 'dark' : ''}`}>
@@ -240,9 +300,11 @@ function App() {
           <button onClick={changeBackground} className="btn">
             🖼️ تغيير الخلفية
           </button>
+          <button onClick={() => setShowAI(!showAI)} className="btn">
+            {showAI ? '🤖 إغلاق المساعد' : '🤖 مساعد ذكي'}
+          </button>
         </div>
 
-        {/* قسم إحصائيات الصلوات */}
         <div className="stats-chart">
           <h3>📊 إحصائيات الصلوات اليومية</h3>
           <div className="progress-bar">
@@ -260,7 +322,6 @@ function App() {
           </div>
         </div>
 
-        {/* قسم أوقات الصلاة */}
         <div className="prayer-section">
           <div className="prayer-header">
             <h3>🕌 أوقات الصلاة في {city}</h3>
@@ -331,6 +392,39 @@ function App() {
           )}
         </div>
       </div>
+
+      {showAI && (
+        <div className="ai-assistant">
+          <div className="ai-header">
+            <h3>🤖 المساعد الذكي</h3>
+            <button onClick={() => setShowAI(false)} className="close-ai">✖</button>
+          </div>
+          <div className="ai-body">
+            <p className="ai-welcome">السلام عليكم! أنا مساعدك الذكي. اسألني أي شيء عن الإسلام، الصلاة، أو العبادات.</p>
+            
+            {aiAnswer && (
+              <div className="ai-answer">
+                <strong>🤖 المساعد:</strong>
+                <p>{aiAnswer}</p>
+              </div>
+            )}
+            
+            {aiLoading && <p className="ai-loading">🤔 جاري التفكير...</p>}
+            
+            <div className="ai-input-area">
+              <input
+                type="text"
+                value={aiQuestion}
+                onChange={(e) => setAiQuestion(e.target.value)}
+                placeholder="اكتب سؤالك هنا..."
+                className="ai-input"
+                onKeyPress={(e) => e.key === 'Enter' && askAI()}
+              />
+              <button onClick={askAI} className="ai-send-btn">💬 أرسل</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
