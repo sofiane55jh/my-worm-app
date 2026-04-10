@@ -13,6 +13,10 @@ function App() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false)
   const [lastNotified, setLastNotified] = useState("")
   
+  // ========== تثبيت التطبيق (PWA) ==========
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
+  const [showInstallButton, setShowInstallButton] = useState(false)
+  
   // ========== الذكاء الاصطناعي ==========
   const [showAI, setShowAI] = useState(false)
   const [aiQuestion, setAiQuestion] = useState("")
@@ -60,6 +64,25 @@ function App() {
   const sendNotification = (title: string, body: string) => {
     if (notificationsEnabled && 'Notification' in window && Notification.permission === 'granted') {
       new Notification(title, { body, icon: 'https://cdn-icons-png.flaticon.com/512/2858/2858518.png' })
+    }
+  }
+
+  // تثبيت التطبيق
+  useEffect(() => {
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault()
+      setDeferredPrompt(e)
+      setShowInstallButton(true)
+    })
+  }, [])
+
+  const installApp = () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt()
+      deferredPrompt.userChoice.then(() => {
+        setDeferredPrompt(null)
+        setShowInstallButton(false)
+      })
     }
   }
 
@@ -281,6 +304,7 @@ function App() {
           <li onClick={() => window.open('https://quran.com/', '_blank')}>📖 المصحف</li>
           <li onClick={() => window.open('https://www.islamweb.net/', '_blank')}>📚 مكتبة إسلامية</li>
           <li onClick={requestNotificationPermission}>🔔 تفعيل الإشعارات</li>
+          {showInstallButton && <li onClick={installApp}>📱 تثبيت التطبيق</li>}
           <li onClick={() => setShowSidebar(false)}>❌ إغلاق</li>
         </ul>
         {notificationsEnabled && <p className="notif-status">✅ الإشعارات مفعلة</p>}
