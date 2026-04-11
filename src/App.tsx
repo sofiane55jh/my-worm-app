@@ -120,6 +120,7 @@ function App() {
     audio.play().catch(e => console.log("صوت غير متاح"))
   }
 
+  // ========== الكود الصحيح لجلب أوقات الصلاة ==========
   const fetchPrayerTimes = async () => {
     setLoading(true)
     try {
@@ -129,6 +130,8 @@ function App() {
       const data = await response.json()
       if (data.code === 200) {
         setPrayerTimes(data.data.timings)
+      } else {
+        console.error("خطأ في API:", data)
       }
     } catch (error) {
       console.error("خطأ في جلب أوقات الصلاة:", error)
