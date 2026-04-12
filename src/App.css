@@ -616,3 +616,176 @@ h1 {
   border-radius: 20px;
   cursor: pointer;
 }
+
+/* ========== تأثيرات تفاعلية ممتعة ========== */
+
+.typing-text {
+  font-size: 20px;
+  font-weight: bold;
+  color: #764ba2;
+  margin: 15px 0;
+  border-right: 3px solid #764ba2;
+  white-space: nowrap;
+  overflow: hidden;
+  animation: blink-caret 0.75s step-end infinite;
+}
+
+@keyframes blink-caret {
+  from, to { border-color: transparent; }
+  50% { border-color: #764ba2; }
+}
+
+.btn:active {
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+.time {
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    text-shadow: 0 0 20px #667eea, 0 0 30px #667eea;
+    transform: scale(1);
+  }
+  50% { 
+    text-shadow: 0 0 40px #764ba2, 0 0 60px #764ba2;
+    transform: scale(1.02);
+  }
+}
+
+.prayer-card {
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  cursor: pointer;
+}
+
+.prayer-card:hover {
+  transform: rotate(5deg) scale(1.05);
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+.prayer-card:hover span,
+.prayer-card:hover strong {
+  color: white;
+}
+
+.btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  transform: translate(-50%, -50%);
+  transition: width 0.5s, height 0.5s;
+}
+
+.btn:active::after {
+  width: 200px;
+  height: 200px;
+}
+
+.confetti {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2000;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  width: 10px;
+  height: 20px;
+  animation: confetti-fall 3s ease-out forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+body {
+  background-size: 200% 200%;
+  animation: gradientShift 8s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.container > * {
+  animation: fadeInUp 0.5s ease-out backwards;
+}
+
+.container > *:nth-child(1) { animation-delay: 0.1s; }
+.container > *:nth-child(2) { animation-delay: 0.2s; }
+.container > *:nth-child(3) { animation-delay: 0.3s; }
+.container > *:nth-child(4) { animation-delay: 0.4s; }
+.container > *:nth-child(5) { animation-delay: 0.5s; }
+.container > *:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.particle {
+  position: fixed;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(102,126,234,0.5), transparent);
+  border-radius: 50%;
+  animation: floatUp linear infinite;
+  pointer-events: none;
+  z-index: 999;
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .typing-text {
+    font-size: 16px;
+    white-space: normal;
+    border-right: none;
+  }
+}

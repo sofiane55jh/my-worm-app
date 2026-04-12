@@ -21,7 +21,11 @@ function App() {
   const [tafsirText, setTafsirText] = useState("")
   const [sleepTime, setSleepTime] = useState("22:00")
   const [wakeTime, setWakeTime] = useState("04:30")
+  const [showConfetti, setShowConfetti] = useState(false)
+  const [typedText, setTypedText] = useState("")
   
+  const fullText = "مرحباً بك في تطبيق أوقات الصلاة"
+
   const [achievements, setAchievements] = useState({
     perfectDay: false,
     weekStreak: 0,
@@ -49,13 +53,27 @@ function App() {
   const [timeRemaining, setTimeRemaining] = useState("")
   const [hijriDate, setHijriDate] = useState("")
 
+  // تأثير الكتابة التلقائية
+  useEffect(() => {
+    let i = 0
+    const typing = setInterval(() => {
+      if (i < fullText.length) {
+        setTypedText(fullText.substring(0, i + 1))
+        i++
+      } else {
+        clearInterval(typing)
+      }
+    }, 100)
+    return () => clearInterval(typing)
+  }, [])
+
   const tafsirData: { [key: string]: string } = {
-    "الفاتحة": "فاتحة الكتاب هي أعظم سورة في القرآن، وهي سبع آيات مثاني، وهي ركن في كل صلاة، وتسمى أم القرآن والسبع المثاني.",
-    "الإخلاص": "سورة الإخلاص تعدل ثلث القرآن، وهي توحد الله وتنفي عنه النقص، قال النبي ﷺ: 'قل هو الله أحد تعدل ثلث القرآن'.",
-    "الرحمن": "سورة الرحمن تعرض نعم الله الظاهرة والباطنة، وتكرر سؤال 'فبأي آلاء ربكما تكذبان' 31 مرة، وتسمى عروس القرآن.",
-    "يس": "سورة يس قلب القرآن، من قرأها في ليلة أصبح مغفوراً له، وهي تشمل قصصاً وعبراً.",
-    "الملك": "سورة الملك هي المانعة من عذاب القبر، من قرأها كل ليلة حفظه الله من عذاب القبر.",
-    "النبأ": "سورة النبأ تتحدث عن يوم القيامة والبعث والنشور، وهي من قصار المفصل."
+    "الفاتحة": "فاتحة الكتاب هي أعظم سورة في القرآن، وهي سبع آيات مثاني، وهي ركن في كل صلاة.",
+    "الإخلاص": "سورة الإخلاص تعدل ثلث القرآن، وهي توحد الله وتنفي عنه النقص.",
+    "الرحمن": "سورة الرحمن تعرض نعم الله الظاهرة والباطنة، وتكرر سؤال 'فبأي آلاء ربكما تكذبان'.",
+    "يس": "سورة يس قلب القرآن، من قرأها في ليلة أصبح مغفوراً له.",
+    "الملك": "سورة الملك هي المانعة من عذاب القبر.",
+    "النبأ": "سورة النبأ تتحدث عن يوم القيامة والبعث والنشور."
   }
 
   const themes = [
@@ -79,13 +97,11 @@ function App() {
     "🌟 احلم ثم حقق أحلامك"
   ]
 
-  // تشغيل الأذان
   const playAdhan = () => {
     const audio = new Audio('https://www.islamcan.com/audio/adhan/adhan.mp3')
     audio.play().catch(e => console.log("تعذر تشغيل الأذان"))
   }
 
-  // النطق الصوتي
   const speakText = (text: string) => {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text)
@@ -95,7 +111,12 @@ function App() {
     }
   }
 
-  // تحديد الموقع
+  const vibrate = () => {
+    if (window.navigator && window.navigator.vibrate) {
+      window.navigator.vibrate(50)
+    }
+  }
+
   const getLocation = () => {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(async (position) => {
@@ -117,7 +138,6 @@ function App() {
     }
   }
 
-  // منبه النوم
   const checkBedtime = () => {
     const now = `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')}`
     if (now === sleepTime) {
@@ -129,26 +149,10 @@ function App() {
     }
   }
 
-  // تصدير إلى PDF
   const exportToPDF = () => {
     const total = Object.values(prayerStats).reduce((a, b) => a + b, 0)
     const rate = Math.min(100, (total / 6) * 100)
-    const report = `
-      تقرير العبادات
-      ===============
-      التاريخ: ${new Date().toLocaleDateString('ar')}
-      الاسم: ${name}
-      المدينة: ${city}
-      إجمالي الصلوات: ${total}
-      نسبة الإنجاز: ${Math.round(rate)}%
-      
-      تفاصيل الصلوات:
-      الفجر: ${prayerStats.الفجر}
-      الظهر: ${prayerStats.الظهر}
-      العصر: ${prayerStats.العصر}
-      المغرب: ${prayerStats.المغرب}
-      العشاء: ${prayerStats.العشاء}
-    `
+    const report = `تقرير العبادات\n===============\nالتاريخ: ${new Date().toLocaleDateString('ar')}\nالاسم: ${name}\nالمدينة: ${city}\nإجمالي الصلوات: ${total}\nنسبة الإنجاز: ${Math.round(rate)}%`
     alert(report)
     sendNotification("📄 تقرير العبادات", "تم إنشاء التقرير")
   }
@@ -189,6 +193,8 @@ function App() {
     const allPrayersDone = Object.values(prayerStats).every(count => count >= 1)
     if (allPrayersDone && !achievements.perfectDay) {
       setAchievements(prev => ({ ...prev, perfectDay: true }))
+      setShowConfetti(true)
+      setTimeout(() => setShowConfetti(false), 3000)
       alert("🏆 إنجاز جديد! أكملت جميع الصلوات!")
       speakText("ماشاء الله، أكملت جميع الصلوات")
     }
@@ -268,6 +274,7 @@ function App() {
   }
 
   const recordPrayer = (prayerName: string) => {
+    vibrate()
     setPrayerStats({...prayerStats, [prayerName]: prayerStats[prayerName as keyof typeof prayerStats] + 1})
     alert(`✅ تم تسجيل صلاة ${prayerName}`)
     speakText(`تم تسجيل صلاة ${prayerName}`)
@@ -469,6 +476,21 @@ function App() {
 
   return (
     <>
+      {/* جسيمات عائمة */}
+      {[...Array(30)].map((_, i) => (
+        <div 
+          key={i} 
+          className="particle" 
+          style={{ 
+            left: Math.random() * 100 + '%',
+            animationDelay: Math.random() * 5 + 's',
+            animationDuration: 2 + Math.random() * 3 + 's',
+            height: 5 + Math.random() * 15 + 'px',
+            width: 2 + Math.random() * 4 + 'px'
+          }}
+        />
+      ))}
+
       <button className="sidebar-toggle" onClick={() => setShowSidebar(!showSidebar)}>☰</button>
 
       <div className={`sidebar ${showSidebar ? 'open' : ''}`}>
@@ -491,6 +513,7 @@ function App() {
       <div className={`container ${darkMode ? 'dark' : ''}`}>
         <h1>✨ {getGreeting()} ✨</h1>
         <h2 className="name">{name}</h2>
+        <h3 className="typing-text">{typedText}</h3>
         
         <div className="family-section">
           <h3>👨‍👩‍👧‍👦 أفراد العائلة</h3>
@@ -550,12 +573,12 @@ function App() {
             <p className="loading-text">جاري تحميل أوقات الصلاة...</p>
           ) : prayerTimes ? (
             <div className="prayer-times-grid">
-              <div className="prayer-card" onClick={() => { setShowTafsir(true); setTafsirText(tafsirData["الفاتحة"] || "لا يوجد تفسير") }}><span>🇫🇯 الفجر</span><strong>{prayerTimes.Fajr?.substring(0, 5)}</strong></div>
+              <div className="prayer-card" onClick={() => { setShowTafsir(true); setTafsirText(tafsirData["الفاتحة"]) }}><span>🇫🇯 الفجر</span><strong>{prayerTimes.Fajr?.substring(0, 5)}</strong></div>
               <div className="prayer-card"><span>☀️ الشروق</span><strong>{prayerTimes.Sunrise?.substring(0, 5)}</strong></div>
-              <div className="prayer-card" onClick={() => { setShowTafsir(true); setTafsirText(tafsirData["الفاتحة"] || "لا يوجد تفسير") }}><span>🌙 الظهر</span><strong>{prayerTimes.Dhuhr?.substring(0, 5)}</strong></div>
-              <div className="prayer-card" onClick={() => { setShowTafsir(true); setTafsirText(tafsirData["الفاتحة"] || "لا يوجد تفسير") }}><span>📖 العصر</span><strong>{prayerTimes.Asr?.substring(0, 5)}</strong></div>
-              <div className="prayer-card" onClick={() => { setShowTafsir(true); setTafsirText(tafsirData["الفاتحة"] || "لا يوجد تفسير") }}><span>🌅 المغرب</span><strong>{prayerTimes.Maghrib?.substring(0, 5)}</strong></div>
-              <div className="prayer-card" onClick={() => { setShowTafsir(true); setTafsirText(tafsirData["الفاتحة"] || "لا يوجد تفسير") }}><span>⭐ العشاء</span><strong>{prayerTimes.Isha?.substring(0, 5)}</strong></div>
+              <div className="prayer-card" onClick={() => { setShowTafsir(true); setTafsirText(tafsirData["الفاتحة"]) }}><span>🌙 الظهر</span><strong>{prayerTimes.Dhuhr?.substring(0, 5)}</strong></div>
+              <div className="prayer-card" onClick={() => { setShowTafsir(true); setTafsirText(tafsirData["الفاتحة"]) }}><span>📖 العصر</span><strong>{prayerTimes.Asr?.substring(0, 5)}</strong></div>
+              <div className="prayer-card" onClick={() => { setShowTafsir(true); setTafsirText(tafsirData["الفاتحة"]) }}><span>🌅 المغرب</span><strong>{prayerTimes.Maghrib?.substring(0, 5)}</strong></div>
+              <div className="prayer-card" onClick={() => { setShowTafsir(true); setTafsirText(tafsirData["الفاتحة"]) }}><span>⭐ العشاء</span><strong>{prayerTimes.Isha?.substring(0, 5)}</strong></div>
             </div>
           ) : null}
 
@@ -620,6 +643,22 @@ function App() {
               <button onClick={askAI} className="ai-send-btn">💬 أرسل</button>
             </div>
           </div>
+        </div>
+      )}
+
+      {showConfetti && (
+        <div className="confetti">
+          {[...Array(50)].map((_, i) => (
+            <div 
+              key={i} 
+              className="confetti-piece" 
+              style={{ 
+                left: Math.random() * 100 + '%', 
+                animationDelay: Math.random() * 2 + 's',
+                backgroundColor: `hsl(${Math.random() * 360}, 100%, 50%)`
+              }}
+            />
+          ))}
         </div>
       )}
     </>
