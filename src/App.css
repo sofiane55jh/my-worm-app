@@ -1,0 +1,936 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: background 0.5s ease;
+}
+
+.container {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 30px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  margin: 20px auto;
+  transition: all 0.3s ease;
+}
+
+.container.dark {
+  background: rgba(30, 30, 40, 0.95);
+  color: white;
+}
+
+h1 {
+  color: #764ba2;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.name {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 28px;
+  margin: 10px 0;
+  font-weight: bold;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 15px 0;
+}
+
+.btn {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: transform 0.2s;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+}
+
+.small-btn {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 11px;
+  margin-top: 5px;
+}
+
+.time {
+  font-size: 48px;
+  font-family: monospace;
+  font-weight: bold;
+  margin: 20px 0;
+  transition: text-shadow 0.3s ease;
+}
+
+.date, .weather {
+  font-size: 14px;
+  color: #888;
+  margin: 5px 0;
+}
+
+.prayer-section {
+  background: rgba(102, 126, 234, 0.15);
+  border-radius: 20px;
+  padding: 15px;
+  margin: 15px 0;
+}
+
+.prayer-header h3 {
+  color: #764ba2;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.city-controls {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}
+
+.city-input {
+  padding: 5px 8px;
+  border: 2px solid #667eea;
+  border-radius: 20px;
+  font-size: 12px;
+  width: 100px;
+  text-align: center;
+}
+
+.prayer-times-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.prayer-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  padding: 8px;
+  text-align: center;
+}
+
+.prayer-card span {
+  display: block;
+  font-size: 11px;
+  color: #666;
+}
+
+.prayer-card strong {
+  display: block;
+  font-size: 14px;
+  color: #667eea;
+}
+
+.next-prayer {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 15px;
+  padding: 10px;
+  margin-top: 10px;
+  text-align: center;
+  color: white;
+}
+
+.quote-section {
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 15px;
+  padding: 10px;
+  margin: 15px 0;
+}
+
+.quote {
+  font-size: 14px;
+  font-style: italic;
+  color: #555;
+}
+
+.countdown-section {
+  margin: 15px 0;
+}
+
+.countdown {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 15px;
+  padding: 10px;
+}
+
+.stats-chart {
+  background: rgba(102, 126, 234, 0.15);
+  border-radius: 20px;
+  padding: 15px;
+  margin: 15px 0;
+}
+
+.stats-chart h3 {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.progress-bar {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  height: 15px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-fill {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.5s ease;
+}
+
+.stats-text {
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.prayer-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.prayer-stat {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  padding: 8px;
+  text-align: center;
+}
+
+.prayer-stat span {
+  display: block;
+  font-size: 10px;
+  color: #666;
+}
+
+.prayer-stat strong {
+  display: block;
+  font-size: 18px;
+  color: #667eea;
+}
+
+.sidebar-toggle {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -260px;
+  width: 240px;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 20px;
+  transition: left 0.3s ease;
+  z-index: 1001;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar h3 {
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  padding: 12px;
+  margin: 5px 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.notif-status {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 5px;
+  border-radius: 10px;
+}
+
+.ai-assistant {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  width: 280px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  overflow: hidden;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ai-header {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ai-header h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.close-ai {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.ai-body {
+  padding: 12px;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.ai-welcome {
+  background: #f0f0f0;
+  padding: 10px;
+  border-radius: 15px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: #666;
+}
+
+.ai-answer {
+  background: #e8f4f8;
+  padding: 10px;
+  border-radius: 15px;
+  margin-bottom: 12px;
+  border-right: 3px solid #667eea;
+}
+
+.ai-answer strong {
+  display: block;
+  color: #667eea;
+  margin-bottom: 5px;
+  font-size: 12px;
+}
+
+.ai-answer p {
+  margin: 0;
+  color: #333;
+  font-size: 13px;
+}
+
+.ai-loading {
+  text-align: center;
+  color: #667eea;
+  margin: 10px 0;
+  font-size: 12px;
+}
+
+.ai-input-area {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.ai-input {
+  flex: 1;
+  padding: 8px;
+  border: 2px solid #667eea;
+  border-radius: 20px;
+  font-size: 12px;
+  outline: none;
+}
+
+.ai-send-btn {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 0 12px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 15px;
+    margin: 10px;
+  }
+  .time {
+    font-size: 36px;
+  }
+  .name {
+    font-size: 22px;
+  }
+  .ai-assistant {
+    width: 260px;
+    bottom: 10px;
+    right: 10px;
+  }
+  .prayer-times-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .prayer-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ========== قسم أفراد العائلة ========== */
+.family-section {
+  margin: 15px 0;
+  background: rgba(102, 126, 234, 0.15);
+  border-radius: 20px;
+  padding: 15px;
+}
+
+.family-section h3 {
+  text-align: center;
+  color: #764ba2;
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+
+.family-grid {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.family-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  padding: 12px 20px;
+  text-align: center;
+  min-width: 100px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.family-card span {
+  display: block;
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 5px;
+}
+
+.family-card strong {
+  display: block;
+  font-size: 18px;
+  color: #667eea;
+  font-weight: bold;
+}
+
+/* ========== شاشة الترحيب ========== */
+.splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeOut 0.5s ease-out 1.5s forwards;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.splash-content {
+  text-align: center;
+  color: white;
+  animation: bounce 1s ease;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+.splash-logo {
+  font-size: 80px;
+  margin-bottom: 20px;
+}
+
+.splash-content h1 {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.splash-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  margin: 20px auto 0;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ========== شارة التاريخ ========== */
+.date-badge {
+  display: flex;
+  justify-content: space-between;
+  background: rgba(102, 126, 234, 0.15);
+  border-radius: 15px;
+  padding: 8px 15px;
+  margin: 10px 0;
+  font-size: 12px;
+  color: #666;
+}
+
+/* ========== إجمالي الإحصائيات ========== */
+.stats-total {
+  text-align: center;
+  margin: 10px 0;
+  padding: 8px;
+  background: rgba(102, 126, 234, 0.2);
+  border-radius: 10px;
+  font-weight: bold;
+  color: #667eea;
+}
+
+/* ========== شارة الإنجاز ========== */
+.achievement-badge {
+  text-align: center;
+  margin-top: 15px;
+  padding: 8px;
+  background: linear-gradient(135deg, #f39c12, #e67e22);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* ========== نافذة التفسير ========== */
+.tafsir-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.tafsir-content {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  max-width: 300px;
+  text-align: center;
+}
+
+.tafsir-content h4 {
+  color: #764ba2;
+  margin-bottom: 10px;
+}
+
+.tafsir-content p {
+  color: #333;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 15px;
+}
+
+.close-tafsir {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+/* ========== تأثيرات تفاعلية ممتعة ========== */
+
+.typing-text {
+  font-size: 20px;
+  font-weight: bold;
+  color: #764ba2;
+  margin: 15px 0;
+  border-right: 3px solid #764ba2;
+  white-space: nowrap;
+  overflow: hidden;
+  animation: blink-caret 0.75s step-end infinite;
+}
+
+@keyframes blink-caret {
+  from, to { border-color: transparent; }
+  50% { border-color: #764ba2; }
+}
+
+.btn:active {
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+.time {
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    text-shadow: 0 0 20px #667eea, 0 0 30px #667eea;
+    transform: scale(1);
+  }
+  50% { 
+    text-shadow: 0 0 40px #764ba2, 0 0 60px #764ba2;
+    transform: scale(1.02);
+  }
+}
+
+.prayer-card {
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  cursor: pointer;
+}
+
+.prayer-card:hover {
+  transform: rotate(5deg) scale(1.05);
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+.prayer-card:hover span,
+.prayer-card:hover strong {
+  color: white;
+}
+
+.btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  transform: translate(-50%, -50%);
+  transition: width 0.5s, height 0.5s;
+}
+
+.btn:active::after {
+  width: 200px;
+  height: 200px;
+}
+
+.confetti {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2000;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  width: 10px;
+  height: 20px;
+  animation: confetti-fall 3s ease-out forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+body {
+  background-size: 200% 200%;
+  animation: gradientShift 8s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.container > * {
+  animation: fadeInUp 0.5s ease-out backwards;
+}
+
+.container > *:nth-child(1) { animation-delay: 0.1s; }
+.container > *:nth-child(2) { animation-delay: 0.2s; }
+.container > *:nth-child(3) { animation-delay: 0.3s; }
+.container > *:nth-child(4) { animation-delay: 0.4s; }
+.container > *:nth-child(5) { animation-delay: 0.5s; }
+.container > *:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.particle {
+  position: fixed;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(102,126,234,0.5), transparent);
+  border-radius: 50%;
+  animation: floatUp linear infinite;
+  pointer-events: none;
+  z-index: 999;
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .typing-text {
+    font-size: 16px;
+    white-space: normal;
+    border-right: none;
+  }
+}
+
+/* ========== اتجاه القبلة ========== */
+.qibla-section {
+  text-align: center;
+  margin: 20px 0;
+  padding: 15px;
+  background: rgba(102,126,234,0.15);
+  border-radius: 20px;
+}
+
+.compass {
+  width: 120px;
+  height: 120px;
+  margin: 10px auto;
+  position: relative;
+  background: rgba(255,255,255,0.9);
+  border-radius: 50%;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.compass-needle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: center;
+  font-size: 40px;
+  transform: translate(-50%, -50%) rotate(0deg);
+  transition: transform 0.3s ease;
+}
+
+/* ========== الأذكار ========== */
+.athkar-section {
+  margin: 20px 0;
+  background: rgba(102, 126, 234, 0.15);
+  border-radius: 20px;
+  padding: 15px;
+}
+
+.athkar-section h3 {
+  text-align: center;
+  color: #764ba2;
+  margin-bottom: 15px;
+}
+
+.athkar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.zekr-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-right: 4px solid #667eea;
+}
+
+.zekr-card:hover {
+  transform: translateX(-5px);
+  background: white;
+}
+
+.zekr-card p {
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.athkar-count {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 14px;
+  color: #667eea;
+  font-weight: bold;
+}
+
+/* ========== التاريخ ========== */
+.date-badge {
+  display: flex;
+  justify-content: space-between;
+  background: rgba(102, 126, 234, 0.15);
+  border-radius: 15px;
+  padding: 8px 15px;
+  margin: 10px 0;
+  font-size: 12px;
+  color: #666;
+}
+
+/* ========== إجمالي الإحصائيات ========== */
+.stats-total {
+  text-align: center;
+  margin: 10px 0;
+  padding: 8px;
+  background: rgba(102, 126, 234, 0.2);
+  border-radius: 10px;
+  font-weight: bold;
+  color: #667eea;
+}
+
+/* ========== أفراد العائلة ========== */
+.family-section {
+  margin: 15px 0;
+  background: rgba(102, 126, 234, 0.15);
+  border-radius: 20px;
+  padding: 15px;
+}
+
+.family-section h3 {
+  text-align: center;
+  color: #764ba2;
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+
+.family-grid {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.family-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  padding: 12px 20px;
+  text-align: center;
+  min-width: 100px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.family-card span {
+  display: block;
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 5px;
+}
+
+.family-card strong {
+  display: block;
+  font-size: 18px;
+  color: #667eea;
+  font-weight: bold;
+}
