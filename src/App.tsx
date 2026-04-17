@@ -9,18 +9,35 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [darkMode, setDarkMode] = useState(false)
   const [showSidebar, setShowSidebar] = useState(false)
-  const [douaas, setDouaas] = useState<any[]>([])
-  const [newDouaa, setNewDouaa] = useState("")
   const [prayerStats, setPrayerStats] = useState({
     الفجر: 0, الظهر: 0, العصر: 0, المغرب: 0, العشاء: 0
   })
   const [showDashboard, setShowDashboard] = useState(false)
   const [showReport, setShowReport] = useState(false)
-  const [showQuiz, setShowQuiz] = useState(false)
-  const [qiblaDirection, setQiblaDirection] = useState(0)
+  const [showChatGPT, setShowChatGPT] = useState(false)
+  const [showHeatmap, setShowHeatmap] = useState(false)
+  const [isListening, setIsListening] = useState(false)
+  const [khatmaProgress, setKhatmaProgress] = useState(0)
+  const [userQuestion, setUserQuestion] = useState("")
+  const [aiResponse, setAiResponse] = useState("")
+  const [donationAmount, setDonationAmount] = useState(0)
+  const [heatmapData, setHeatmapData] = useState<number[]>(Array(9).fill(0))
 
   const totalPrayers = Object.values(prayerStats).reduce((a, b) => a + b, 0)
   const completionRate = Math.min(100, (totalPrayers / 5) * 100)
+
+  // خريطة حرارية
+  useEffect(() => {
+    const hour = new Date().getHours()
+    const index = Math.floor(hour / 3)
+    if (index < 9) {
+      setHeatmapData(prev => {
+        const newData = [...prev]
+        newData[index] = newData[index] + 1
+        return newData
+      })
+    }
+  }, [currentTime])
 
   const fetchPrayerTimes = async () => {
     setLoading(true)
@@ -36,15 +53,34 @@ function App() {
     setPrayerStats({...prayerStats, [prayer]: prayerStats[prayer as keyof typeof prayerStats] + 1})
   }
 
-  const addDouaa = () => {
-    if (!newDouaa.trim()) return
-    setDouaas([...douaas, { text: newDouaa, date: new Date().toISOString() }])
-    setNewDouaa("")
+  const askChatGPT = () => {
+    if (!userQuestion.trim()) return
+    setAiResponse("رد على سؤالك: " + userQuestion)
+    setUserQuestion("")
   }
 
-  const shareToWhatsApp = () => {
-    const message = `تقرير صلاتي اليوم\nالفجر: ${prayerStats.الفجر}\nالظهر: ${prayerStats.الظهر}\nالعصر: ${prayerStats.العصر}\nالمغرب: ${prayerStats.المغرب}\nالعشاء: ${prayerStats.العشاء}\nالإجمالي: ${totalPrayers} صلاة`
-    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank')
+  const startVoiceCommands = () => {
+    const recognition = new (window as any).webkitSpeechRecognition()
+    recognition.lang = 'ar-SA'
+    recognition.onstart = () => setIsListening(true)
+    recognition.onend = () => setIsListening(false)
+    recognition.onresult = (event: any) => {
+      const command = event.results[0][0].transcript
+      if (command.includes("الفجر")) recordPrayer("الفجر")
+      if (command.includes("الظهر")) recordPrayer("الظهر")
+      if (command.includes("العصر")) recordPrayer("العصر")
+      if (command.includes("المغرب")) recordPrayer("المغرب")
+      if (command.includes("العشاء")) recordPrayer("العشاء")
+      alert(`🎤 تم التعرف على: ${command}`)
+    }
+    recognition.start()
+  }
+
+  const donate = () => {
+    if (donationAmount > 0) {
+      alert(`💰 شكراً لتبرعك بـ ${donationAmount} دينار`)
+      setDonationAmount(0)
+    }
   }
 
   useEffect(() => {
@@ -52,14 +88,6 @@ function App() {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000)
     return () => clearInterval(timer)
   }, [city])
-
-  useEffect(() => {
-    if (window.DeviceOrientationEvent) {
-      window.addEventListener('deviceorientation', (event) => {
-        if (event.alpha !== null) setQiblaDirection(event.alpha)
-      })
-    }
-  }, [])
 
   const hours = currentTime.getHours()
   const minutes = currentTime.getMinutes()
@@ -76,25 +104,35 @@ function App() {
     return "مساء النور 🌙"
   }
 
+  const heatmapLabels = ['الفجر', 'الضحى', 'الظهر', 'العصر', 'المغرب', 'العشاء', 'الليل', 'التهجد', 'السحر']
+
   return (
     <div className={`app ${darkMode ? 'dark' : ''}`}>
+      {/* زر القائمة الجانبية */}
       <button className="menu-btn" onClick={() => setShowSidebar(!showSidebar)}>☰</button>
 
+      {/* القائمة الجانبية */}
       <div className={`sidebar ${showSidebar ? 'open' : ''}`}>
-        <h3>📋 القائمة</h3>
+        <div className="sidebar-header">
+          <h3>📋 القائمة</h3>
+          <button className="sidebar-close" onClick={() => setShowSidebar(false)}>✖</button>
+        </div>
         <ul>
           <li onClick={() => window.open('https://quran.com/', '_blank')}>📖 المصحف</li>
           <li onClick={() => window.open('https://www.islamweb.net/', '_blank')}>📚 مكتبة إسلامية</li>
           <li onClick={() => setDarkMode(!darkMode)}>{darkMode ? '☀️ وضع نهاري' : '🌙 وضع ليلي'}</li>
           <li onClick={() => setPrayerStats({ الفجر: 0, الظهر: 0, العصر: 0, المغرب: 0, العشاء: 0 })}>🔄 إعادة تعيين</li>
-          <li onClick={shareToWhatsApp}>💬 مشاركة عبر واتساب</li>
           <li onClick={() => setShowDashboard(!showDashboard)}>📊 {showDashboard ? 'إخفاء' : 'إظهار'} لوحة التحكم</li>
           <li onClick={() => setShowReport(!showReport)}>📄 {showReport ? 'إخفاء' : 'إظهار'} التقرير</li>
-          <li onClick={() => setShowQuiz(!showQuiz)}>🎮 {showQuiz ? 'إغلاق' : 'فتح'} الألعاب</li>
+          <li onClick={() => setShowChatGPT(!showChatGPT)}>🤖 {showChatGPT ? 'إغلاق' : 'فتح'} المساعد</li>
+          <li onClick={() => setShowHeatmap(!showHeatmap)}>🌡️ {showHeatmap ? 'إخفاء' : 'إظهار'} الخريطة الحرارية</li>
+          <li onClick={startVoiceCommands} className={isListening ? 'voice-active' : ''}>🎤 {isListening ? 'جاري الاستماع...' : 'أوامر صوتية'}</li>
+          <li onClick={() => setKhatmaProgress(Math.min(100, khatmaProgress + 10))}>📖 ختمة القرآن ({khatmaProgress}%)</li>
           <li onClick={() => setShowSidebar(false)}>❌ إغلاق</li>
         </ul>
       </div>
 
+      {/* المحتوى الرئيسي */}
       <div className="container">
         <div className="header">
           <h1 className="greeting">{getGreeting()}</h1>
@@ -143,49 +181,64 @@ function App() {
           <div className="stats-total"><span>📊 إجمالي الصلوات: {totalPrayers}</span></div>
         </div>
 
-        {/* بوصلة القبلة */}
-        <div className="qibla-compass">
-          <h3>🕋 اتجاه القبلة</h3>
-          <div className="compass">
-            <div className="compass-needle" style={{ transform: `rotate(${qiblaDirection}deg)` }}>🧭</div>
-          </div>
-          <p>اتجه {Math.round(qiblaDirection)}° من الشمال</p>
-        </div>
-
-        {/* الأدعية */}
-        <div className="douaa-section">
-          <h3>📿 أدعية المستخدمين</h3>
-          <div className="douaa-input">
-            <input type="text" value={newDouaa} onChange={(e) => setNewDouaa(e.target.value)} placeholder="اكتب دعاء..." />
-            <button onClick={addDouaa}>➕ إضافة</button>
-          </div>
-          <div className="douaas-list">
-            {douaas.slice().reverse().map((douaa, index) => (
-              <div key={index} className="douaa-card">
-                <p>📖 {douaa.text}</p>
-                <small>{new Date(douaa.date).toLocaleDateString('ar')}</small>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* لوحة التحكم */}
-        {showDashboard && (
-          <div className="dashboard-modern">
-            <h3>📊 لوحة التحكم</h3>
-            <div className="dashboard-stats">
-              <div className="dash-card"><span>📈 إجمالي الصلوات</span><strong>{totalPrayers}</strong></div>
-              <div className="dash-card"><span>🎯 نسبة الإنجاز</span><strong>{Math.round(completionRate)}%</strong></div>
-              <div className="dash-card"><span>⭐ مستوى الالتزام</span><strong>{completionRate > 80 ? 'ممتاز' : completionRate > 50 ? 'جيد' : 'يحتاج تحسين'}</strong></div>
+        {/* خريطة حرارية */}
+        {showHeatmap && (
+          <div className="heatmap">
+            <h3>🌡️ خريطة أوقات الصلاة</h3>
+            <div className="heatmap-grid">
+              {heatmapLabels.map((label, i) => (
+                <div key={i} className="heatmap-cell" style={{ 
+                  backgroundColor: `rgba(102,126,234, ${Math.min(1, heatmapData[i] / 10)})`,
+                  height: `${40 + heatmapData[i]}px`
+                }}>
+                  <span>{label}</span>
+                  <strong>{heatmapData[i]}</strong>
+                </div>
+              ))}
             </div>
           </div>
         )}
 
-        {/* التقرير */}
+        {/* نافذة ChatGPT */}
+        {showChatGPT && (
+          <div className="modal-overlay" onClick={() => setShowChatGPT(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>🤖 المساعد الذكي</h3>
+                <button className="modal-close" onClick={() => setShowChatGPT(false)}>✖</button>
+              </div>
+              <textarea value={userQuestion} onChange={(e) => setUserQuestion(e.target.value)} placeholder="اسأل أي سؤال..." rows={3} />
+              <button onClick={askChatGPT}>💬 أرسل</button>
+              {aiResponse && <p className="ai-response">{aiResponse}</p>}
+            </div>
+          </div>
+        )}
+
+        {/* نافذة لوحة التحكم */}
+        {showDashboard && (
+          <div className="modal-overlay" onClick={() => setShowDashboard(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>📊 لوحة التحكم</h3>
+                <button className="modal-close" onClick={() => setShowDashboard(false)}>✖</button>
+              </div>
+              <div className="dashboard-stats">
+                <div className="dash-card"><span>📈 إجمالي الصلوات</span><strong>{totalPrayers}</strong></div>
+                <div className="dash-card"><span>🎯 نسبة الإنجاز</span><strong>{Math.round(completionRate)}%</strong></div>
+                <div className="dash-card"><span>⭐ مستوى الالتزام</span><strong>{completionRate > 80 ? 'ممتاز' : completionRate > 50 ? 'جيد' : 'يحتاج تحسين'}</strong></div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* نافذة التقرير */}
         {showReport && (
-          <div className="report-modal">
-            <div className="report-content">
-              <h3>📄 تقرير العبادات</h3>
+          <div className="modal-overlay" onClick={() => setShowReport(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>📄 تقرير العبادات</h3>
+                <button className="modal-close" onClick={() => setShowReport(false)}>✖</button>
+              </div>
               <p>📅 {new Date().toLocaleDateString('ar')}</p>
               <p>🕌 الفجر: {prayerStats.الفجر}</p>
               <p>🌙 الظهر: {prayerStats.الظهر}</p>
@@ -193,23 +246,24 @@ function App() {
               <p>🌅 المغرب: {prayerStats.المغرب}</p>
               <p>⭐ العشاء: {prayerStats.العشاء}</p>
               <p>📊 الإجمالي: {totalPrayers}</p>
-              <button onClick={() => setShowReport(false)}>❌ إغلاق</button>
             </div>
           </div>
         )}
 
-        {/* الألعاب */}
-        {showQuiz && (
-          <div className="quiz-modal">
-            <div className="quiz-content">
-              <h3>🎮 اختبار ديني</h3>
-              <p>ما هي أول صلاة فرضت على النبي؟</p>
-              <button onClick={() => alert("الظهر ✅")}>الظهر</button>
-              <button onClick={() => alert("الفجر ❌")}>الفجر</button>
-              <button onClick={() => setShowQuiz(false)}>❌ إغلاق</button>
-            </div>
-          </div>
-        )}
+        {/* ختمة القرآن */}
+        <div className="khatma-section">
+          <h3>📖 ختمة القرآن</h3>
+          <div className="khatma-progress"><div className="khatma-fill" style={{ width: `${khatmaProgress}%` }}></div></div>
+          <p>{khatmaProgress}% مكتمل</p>
+          <button onClick={() => setKhatmaProgress(Math.min(100, khatmaProgress + 10))}>➕ تقدم</button>
+        </div>
+
+        {/* تبرعات */}
+        <div className="donation-section">
+          <h3>💰 التبرعات</h3>
+          <input type="number" value={donationAmount} onChange={(e) => setDonationAmount(Number(e.target.value))} placeholder="المبلغ" />
+          <button onClick={donate}>تبرع الآن</button>
+        </div>
 
         <div className="quote-card">
           <p className="quote-text">"إن مع العسر يسراً"</p>
