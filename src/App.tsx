@@ -1,90 +1,57 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './App.css'
+import { Bar } from 'react-chartjs-2'
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js'
+import axios from 'axios'
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 function App() {
   const [currentTime, setCurrentTime] = useState(new Date())
-  const [name, setName] = useState("السعد سفيان")
-  const [darkMode, setDarkMode] = useState(false)
+  const [name, setName] = useState("أم السعد سفيان")
   const [city, setCity] = useState("الجزائر")
   const [prayerTimes, setPrayerTimes] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const [hijriDate, setHijriDate] = useState("")
-  const [showStats, setShowStats] = useState(false)
-  const [showQuote, setShowQuote] = useState(true)
-  const [currentTheme, setCurrentTheme] = useState(0)
-  const [bgAnimation, setBgAnimation] = useState(true)
+  const [darkMode, setDarkMode] = useState(false)
+  const [showSidebar, setShowSidebar] = useState(false)
+  const [weather, setWeather] = useState<any>(null)
+  const [voiceSearch, setVoiceSearch] = useState(false)
+  const [draggedItem, setDraggedItem] = useState<string | null>(null)
   
   // إحصائيات الصلوات
   const [prayerStats, setPrayerStats] = useState({
     الفجر: 0, الظهر: 0, العصر: 0, المغرب: 0, العشاء: 0
   })
 
-  // اقتباسات ملهمة
-  const quotes = [
-    "🌟 لا تؤجل عمل اليوم إلى الغد",
-    "💪 مع الصبر يأتي النجاح",
-    "📚 العلم نور والجهل ظلام",
-    "❤️ الحياة جميلة بأشخاصها",
-    "🕌 الصلاة نور المؤمن",
-    "✨ تفاءلوا بالخير تجدوه",
-    "💖 الدعاء مفتاح الرحمة",
-    "🌙 استغفر الله فإنه غفور رحيم"
-  ]
-  const [currentQuote, setCurrentQuote] = useState(quotes[0])
+  // بيانات الرسم البياني
+  const chartData = {
+    labels: ['الفجر', 'الظهر', 'العصر', 'المغرب', 'العشاء'],
+    datasets: [{
+      label: 'عدد الصلوات',
+      data: Object.values(prayerStats),
+      backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b'],
+      borderRadius: 10,
+    }]
+  }
 
-  // ألوان الخلفية المتعددة
-  const themes = [
-    "linear-gradient(135deg, #667eea, #764ba2)",
-    "linear-gradient(135deg, #f093fb, #f5576c)",
-    "linear-gradient(135deg, #4facfe, #00f2fe)",
-    "linear-gradient(135deg, #43e97b, #38f9d7)",
-    "linear-gradient(135deg, #fa709a, #fee140)",
-    "linear-gradient(135deg, #a8edea, #fed6e3)",
-    "linear-gradient(135deg, #ff9a9e, #fecfef)",
-    "linear-gradient(135deg, #ffecd2, #fcb69f)"
-  ]
-
-  // جلب التاريخ الهجري
-  useEffect(() => {
-    fetch('https://api.aladhan.com/v1/gToH?date=' + new Date().toISOString().split('T')[0])
-      .then(res => res.json())
-      .then(data => {
-        if (data.data) {
-          setHijriDate(`${data.data.hijri.day} ${data.data.hijri.month.ar} ${data.data.hijri.year}`)
-        }
-      })
-      .catch(err => console.log("خطأ"))
-  }, [])
-
-  // تغيير الاقتباس كل 10 ثواني
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const randomIndex = Math.floor(Math.random() * quotes.length)
-      setCurrentQuote(quotes[randomIndex])
-    }, 10000)
-    return () => clearInterval(interval)
-  }, [])
-
-  // تغيير الخلفية تلقائياً
-  useEffect(() => {
-    if (!bgAnimation) return
-    const interval = setInterval(() => {
-      setCurrentTheme((prev) => (prev + 1) % themes.length)
-      document.body.style.background = themes[currentTheme]
-    }, 15000)
-    return () => clearInterval(interval)
-  }, [bgAnimation, currentTheme])
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom' as const },
+      tooltip: { backgroundColor: '#764ba2' }
+    }
+  }
 
   // جلب أوقات الصلاة
   const fetchPrayerTimes = async () => {
     setLoading(true)
     try {
-      const response = await fetch(
+      const response = await axios.get(
         `https://api.aladhan.com/v1/timingsByCity?city=${city}&country=الجزائر&method=8`
       )
-      const data = await response.json()
-      if (data.code === 200) {
-        setPrayerTimes(data.data.timings)
+      if (response.data.code === 200) {
+        setPrayerTimes(response.data.data.timings)
       }
     } catch (error) {
       console.error("خطأ:", error)
@@ -93,30 +60,69 @@ function App() {
     }
   }
 
-  useEffect(() => {
-    fetchPrayerTimes()
-    const timer = setInterval(() => {
-      setCurrentTime(new Date())
-    }, 1000)
-    return () => clearInterval(timer)
-  }, [city])
+  // جلب حالة الطقس
+  const fetchWeather = async () => {
+    try {
+      const response = await axios.get(
+        `https://goweather.herokuapp.com/weather/${city}`
+      )
+      setWeather(response.data)
+    } catch (error) {
+      console.error("خطأ في جلب الطقس:", error)
+    }
+  }
 
-  // تسجيل الصلاة
+  // التعرف على الصوت
+  const startVoiceSearch = () => {
+    if ('webkitSpeechRecognition' in window) {
+      const recognition = new (window as any).webkitSpeechRecognition()
+      recognition.lang = 'ar-SA'
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript
+        setCity(transcript)
+        setVoiceSearch(false)
+      }
+      recognition.start()
+      setVoiceSearch(true)
+    } else {
+      alert("متصفحك لا يدعم التعرف على الصوت")
+    }
+  }
+
+  // Drag & Drop
+  const handleDragStart = (e: React.DragEvent, item: string) => {
+    setDraggedItem(item)
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  const handleDrop = (e: React.DragEvent, target: string) => {
+    e.preventDefault()
+    if (draggedItem) {
+      const newStats = { ...prayerStats }
+      const draggedValue = newStats[draggedItem as keyof typeof prayerStats]
+      const targetValue = newStats[target as keyof typeof prayerStats]
+      newStats[draggedItem as keyof typeof prayerStats] = targetValue
+      newStats[target as keyof typeof prayerStats] = draggedValue
+      setPrayerStats(newStats)
+      setDraggedItem(null)
+    }
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+  }
+
+  // تسجيل صلاة
   const recordPrayer = (prayer: string) => {
     setPrayerStats({...prayerStats, [prayer]: prayerStats[prayer as keyof typeof prayerStats] + 1})
-    // تأثير اهتزاز خفيف
-    if (window.navigator && window.navigator.vibrate) {
-      window.navigator.vibrate(50)
-    }
-    alert(`✅ تم تسجيل صلاة ${prayer}`)
   }
 
-  // تغيير الخلفية يدوياً
-  const changeTheme = () => {
-    const next = (currentTheme + 1) % themes.length
-    setCurrentTheme(next)
-    document.body.style.background = themes[next]
-  }
+  useEffect(() => {
+    fetchPrayerTimes()
+    fetchWeather()
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000)
+    return () => clearInterval(timer)
+  }, [city])
 
   const hours = currentTime.getHours()
   const minutes = currentTime.getMinutes()
@@ -128,107 +134,137 @@ function App() {
   const dayName = weekDays[currentTime.getDay()]
 
   const getGreeting = () => {
-    if (hours < 12) return "🌅 صباح الخير"
-    if (hours < 18) return "🌤️ مساء الخير"
-    return "🌙 مساء النور"
+    if (hours < 12) return "صباح الخير ☀️"
+    if (hours < 18) return "مساء الخير 🌤️"
+    return "مساء النور 🌙"
   }
 
-  const totalPrayers = Object.values(prayerStats).reduce((a, b) => a + b, 0)
-  const completionRate = Math.min(100, (totalPrayers / 5) * 100)
+  const getWeatherEmoji = () => {
+    if (!weather) return "🌡️"
+    const temp = weather.temperature
+    if (temp && parseInt(temp) > 25) return "☀️🔥"
+    if (temp && parseInt(temp) > 15) return "🌤️"
+    return "🌙❄️"
+  }
 
   return (
-    <div className={`container ${darkMode ? 'dark' : ''}`}>
-      {/* أزرار التحكم */}
-      <div className="floating-buttons">
-        <button className="float-btn" onClick={() => setDarkMode(!darkMode)} title="وضع ليلي">
-          {darkMode ? '☀️' : '🌙'}
-        </button>
-        <button className="float-btn" onClick={changeTheme} title="تغيير الخلفية">
-          🎨
-        </button>
-        <button className="float-btn" onClick={() => setShowStats(!showStats)} title="إحصائيات">
-          📊
-        </button>
-        <button className="float-btn" onClick={() => setBgAnimation(!bgAnimation)} title={bgAnimation ? "إيقاف الحركة" : "تشغيل الحركة"}>
-          {bgAnimation ? '⏸️' : '▶️'}
-        </button>
+    <div className={`app ${darkMode ? 'dark' : ''}`}>
+      {/* زر القائمة الجانبية */}
+      <button className="menu-btn" onClick={() => setShowSidebar(!showSidebar)}>☰</button>
+
+      {/* القائمة الجانبية */}
+      <div className={`sidebar ${showSidebar ? 'open' : ''}`}>
+        <h3>📋 القائمة</h3>
+        <ul>
+          <li onClick={() => window.open('https://quran.com/', '_blank')}>📖 المصحف</li>
+          <li onClick={() => window.open('https://www.islamweb.net/', '_blank')}>📚 مكتبة إسلامية</li>
+          <li onClick={() => setDarkMode(!darkMode)}>{darkMode ? '☀️ وضع نهاري' : '🌙 وضع ليلي'}</li>
+          <li onClick={() => setShowSidebar(false)}>❌ إغلاق</li>
+        </ul>
       </div>
 
-      {/* البطاقة الرئيسية */}
-      <div className="main-card">
-        <div className="greeting-badge">{getGreeting()}</div>
-        <h1 className="name-title">{name}</h1>
-        
-        {/* الساعة */}
-        <div className="clock">
-          <span className="clock-hours">{hours.toString().padStart(2, '0')}</span>
-          <span className="clock-sep">:</span>
-          <span className="clock-minutes">{minutes.toString().padStart(2, '0')}</span>
-          <span className="clock-sep">:</span>
-          <span className="clock-seconds">{seconds.toString().padStart(2, '0')}</span>
+      {/* المحتوى الرئيسي */}
+      <div className="container">
+        <div className="header">
+          <h1 className="greeting">{getGreeting()}</h1>
+          <h2 className="name">{name}</h2>
+          <div className="datetime">
+            <span className="date">📅 {dayName} {day}/{month}/{year}</span>
+            <span className="time">{hours.toString().padStart(2, '0')}:{minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}</span>
+          </div>
         </div>
 
-        {/* التاريخ */}
-        <div className="date-container">
-          <span className="gregorian">📅 {dayName} {day}/{month}/{year}</span>
-          <span className="hijri">🕌 {hijriDate}</span>
-        </div>
-      </div>
+        {/* الطقس */}
+        {weather && (
+          <div className="weather-card">
+            <span className="weather-icon">{getWeatherEmoji()}</span>
+            <div className="weather-info">
+              <span>🌡️ {weather.temperature || '--'}°C</span>
+              <span>💨 {weather.wind || '--'} km/h</span>
+            </div>
+          </div>
+        )}
 
-      {/* الاقتباس اليومي */}
-      {showQuote && (
+        {/* البحث بالصوت */}
+        <div className="search-section">
+          <div className="city-search">
+            <input 
+              type="text" 
+              value={city} 
+              onChange={(e) => setCity(e.target.value)} 
+              placeholder="البحث عن مدينة..."
+              className="city-input"
+            />
+            <button onClick={startVoiceSearch} className="voice-btn">
+              🎤 {voiceSearch ? 'جاري الاستماع...' : 'بحث صوتي'}
+            </button>
+          </div>
+          <button onClick={fetchPrayerTimes} className="search-btn">🔍 بحث</button>
+        </div>
+
+        {/* أوقات الصلاة */}
+        <div className="prayer-section">
+          <h3>🕌 أوقات الصلاة في {city}</h3>
+          {loading ? (
+            <div className="loader"></div>
+          ) : prayerTimes ? (
+            <div className="prayer-grid">
+              <div className="prayer-card" draggable onDragStart={(e) => handleDragStart(e, 'الفجر')}>
+                <span>🇫🇯 الفجر</span>
+                <strong>{prayerTimes.Fajr?.substring(0, 5)}</strong>
+              </div>
+              <div className="prayer-card" draggable onDragStart={(e) => handleDragStart(e, 'الظهر')}>
+                <span>🌙 الظهر</span>
+                <strong>{prayerTimes.Dhuhr?.substring(0, 5)}</strong>
+              </div>
+              <div className="prayer-card" draggable onDragStart={(e) => handleDragStart(e, 'العصر')}>
+                <span>📖 العصر</span>
+                <strong>{prayerTimes.Asr?.substring(0, 5)}</strong>
+              </div>
+              <div className="prayer-card" draggable onDragStart={(e) => handleDragStart(e, 'المغرب')}>
+                <span>🌅 المغرب</span>
+                <strong>{prayerTimes.Maghrib?.substring(0, 5)}</strong>
+              </div>
+              <div className="prayer-card" draggable onDragStart={(e) => handleDragStart(e, 'العشاء')}>
+                <span>⭐ العشاء</span>
+                <strong>{prayerTimes.Isha?.substring(0, 5)}</strong>
+              </div>
+            </div>
+          ) : null}
+          <p className="drag-hint">💡 يمكنك سحب وإفلات البطاقات لترتيبها</p>
+        </div>
+
+        {/* الرسم البياني */}
+        <div className="chart-section">
+          <h3>📊 إحصائيات الصلوات الشهرية</h3>
+          <div className="chart-container">
+            <Bar data={chartData} options={chartOptions} />
+          </div>
+        </div>
+
+        {/* أزرار تسجيل الصلوات */}
+        <div className="stats-buttons">
+          {Object.entries(prayerStats).map(([prayer, count]) => (
+            <div 
+              key={prayer} 
+              className="stat-btn"
+              draggable
+              onDragStart={(e) => handleDragStart(e, prayer)}
+              onDrop={(e) => handleDrop(e, prayer)}
+              onDragOver={handleDragOver}
+            >
+              <span>🕌 {prayer}</span>
+              <strong>{count}</strong>
+              <button onClick={() => recordPrayer(prayer)}>➕</button>
+            </div>
+          ))}
+        </div>
+
+        {/* الاقتباس اليومي */}
         <div className="quote-card">
-          <p className="quote-text">💬 {currentQuote}</p>
-          <div className="quote-animation"></div>
+          <p className="quote-text">"إن مع العسر يسراً"</p>
+          <p className="quote-ref">سورة الشرح</p>
         </div>
-      )}
-
-      {/* إحصائيات الصلوات */}
-      {showStats && (
-        <div className="stats-card">
-          <h3>📊 إنجازاتي اليومية</h3>
-          <div className="progress-ring">
-            <div className="progress-circle" style={{ transform: `rotate(${completionRate * 3.6}deg)` }}></div>
-            <span className="progress-percent">{Math.round(completionRate)}%</span>
-          </div>
-          <div className="stats-buttons">
-            {Object.entries(prayerStats).map(([prayer, count]) => (
-              <button key={prayer} className="stat-btn" onClick={() => recordPrayer(prayer)}>
-                🕌 {prayer} <span className="stat-count">{count}</span> +
-              </button>
-            ))}
-          </div>
-          <button className="reset-btn" onClick={() => setPrayerStats({الفجر:0, الظهر:0, العصر:0, المغرب:0, العشاء:0})}>
-            🔄 إعادة تعيين
-          </button>
-        </div>
-      )}
-
-      {/* أوقات الصلاة */}
-      <div className="prayer-card-large">
-        <h3>🕌 أوقات الصلاة في {city}</h3>
-        <div className="search-box">
-          <input 
-            type="text" 
-            value={city} 
-            onChange={(e) => setCity(e.target.value)} 
-            placeholder="اكتب اسم المدينة"
-          />
-          <button onClick={fetchPrayerTimes}>🔍 بحث</button>
-        </div>
-        
-        {loading ? (
-          <div className="loader"></div>
-        ) : prayerTimes ? (
-          <div className="prayer-grid">
-            <div className="prayer-item"><span>🇫🇯 الفجر</span><strong>{prayerTimes.Fajr?.substring(0, 5)}</strong><div className="prayer-glow"></div></div>
-            <div className="prayer-item"><span>☀️ الشروق</span><strong>{prayerTimes.Sunrise?.substring(0, 5)}</strong><div className="prayer-glow"></div></div>
-            <div className="prayer-item"><span>🌙 الظهر</span><strong>{prayerTimes.Dhuhr?.substring(0, 5)}</strong><div className="prayer-glow"></div></div>
-            <div className="prayer-item"><span>📖 العصر</span><strong>{prayerTimes.Asr?.substring(0, 5)}</strong><div className="prayer-glow"></div></div>
-            <div className="prayer-item"><span>🌅 المغرب</span><strong>{prayerTimes.Maghrib?.substring(0, 5)}</strong><div className="prayer-glow"></div></div>
-            <div className="prayer-item"><span>⭐ العشاء</span><strong>{prayerTimes.Isha?.substring(0, 5)}</strong><div className="prayer-glow"></div></div>
-          </div>
-        ) : null}
       </div>
     </div>
   )
